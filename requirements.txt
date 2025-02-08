@@ -1,0 +1,9 @@
+# List of dependencies
+ipython
+ipykernel
+numpy
+pandas
+matplotlib
+seaborn
+kafka
+
