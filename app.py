@@ -70,34 +70,56 @@ def calculate_fight_outcome(db_path="data/ufc_fighters.db"):
             fighter2_data = dict(zip([description[0] for description in cursor.description], fighter2))
 
             # check fighter data for nulls
-            if None in fighter1_data.values() or None in fighter2_data.values():
-                print("Fighter data is incomplete.")
-                return
+            # Allow 'nickname' to be null
+            fighter1_data = {k: v for k, v in fighter1_data.items() if k != 'nickname'}
+            fighter2_data = {k: v for k, v in fighter2_data.items() if k != 'nickname'}
 
             # Basic Fight Simulation 
             fighter1_score = 0
             fighter2_score = 0
 
             # Striking
-            fighter1_score += fighter1_data['significant_strikes_landed_per_minute'] * fighter1_data['significant_striking_accuracy']
-            fighter2_score += fighter2_data['significant_strikes_landed_per_minute'] * fighter2_data['significant_striking_accuracy']
+            if (fighter1_data['significant_strikes_landed_per_minute'] is None or 
+                fighter1_data['significant_striking_accuracy'] is None or 
+                fighter2_data['significant_strikes_landed_per_minute'] is None or 
+                fighter2_data['significant_striking_accuracy'] is None):
+                fighter1_score += 0
+                fighter2_score += 0
+            else:
+                fighter1_score += fighter1_data['significant_strikes_landed_per_minute'] * fighter1_data['significant_striking_accuracy']
+                fighter2_score += fighter2_data['significant_strikes_landed_per_minute'] * fighter2_data['significant_striking_accuracy']
 
             # Takedowns
-            fighter1_score += fighter1_data['average_takedowns_landed_per_15_minutes'] * fighter1_data['takedown_accuracy']
-            fighter2_score += fighter2_data['average_takedowns_landed_per_15_minutes'] * fighter2_data['takedown_accuracy']
+            if (fighter1_data['average_takedowns_landed_per_15_minutes'] is None or 
+                fighter1_data['takedown_accuracy'] is None or 
+                fighter2_data['average_takedowns_landed_per_15_minutes'] is None or 
+                fighter2_data['takedown_accuracy'] is None):
+                fighter1_score += 0
+                fighter2_score += 0
+            else:
+                fighter1_score += fighter1_data['average_takedowns_landed_per_15_minutes'] * fighter1_data['takedown_accuracy']
+                fighter2_score += fighter2_data['average_takedowns_landed_per_15_minutes'] * fighter2_data['takedown_accuracy']
 
             # Submissions
-            fighter1_score += fighter1_data['average_submissions_attempted_per_15_minutes']
-            fighter2_score += fighter2_data['average_submissions_attempted_per_15_minutes']
+            if (fighter1_data['average_submissions_attempted_per_15_minutes'] is None or
+                fighter2_data['average_submissions_attempted_per_15_minutes'] is None):
+                fighter1_score += 0
+                fighter2_score += 0
+            else:
+                fighter1_score += fighter1_data['average_submissions_attempted_per_15_minutes']
+                fighter2_score += fighter2_data['average_submissions_attempted_per_15_minutes']
 
             # Height/Reach Advantage 
-            height_diff = fighter1_data['height_cm'] - fighter2_data['height_cm']
-            reach_diff = fighter1_data['reach_in_cm'] - fighter2_data['reach_in_cm']
-
-            if height_diff > 5:  fighter1_score += 1 
-            elif height_diff < -5: fighter2_score += 1
-            if reach_diff > 5: fighter1_score += 1
-            elif reach_diff < -5: fighter2_score += 1
+            if fighter1_data['height_cm'] is None or fighter2_data['height_cm'] is None or fighter1_data['reach_in_cm'] is None or fighter2_data['reach_in_cm'] is None:
+                fighter1_score += 0
+                fighter2_score += 0
+            else:
+                height_diff = fighter1_data['height_cm'] - fighter2_data['height_cm']
+                reach_diff = fighter1_data['reach_in_cm'] - fighter2_data['reach_in_cm']
+                if height_diff > 5:  fighter1_score += 1 
+                elif height_diff < -5: fighter2_score += 1
+                if reach_diff > 5: fighter1_score += 1
+                elif reach_diff < -5: fighter2_score += 1
 
             # Add some randomness to simulate upsets
             fighter1_score += random.uniform(-2, 2)
