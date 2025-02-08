@@ -2,7 +2,6 @@ import sqlite3
 import pandas as pd
 import random
 from datetime import datetime
-import streamlit as st
 
 weight_class = {
     'Strawweight': 52.2,

@@ -16,7 +16,7 @@ def get_fighter():
 def main():
     '''Select two random fighters and send to Kafka topic'''
     while True:
-        for _ in range(2):
+        for _ in range(1):
             fighter = get_fighter()
             producer.send(KAFKA_TOPIC, value=fighter)
             print(f'Produced: {fighter}')
