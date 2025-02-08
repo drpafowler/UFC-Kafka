@@ -21,7 +21,7 @@ def main():
             producer.send(KAFKA_TOPIC, value=fighter)
             print(f'Produced: {fighter}')
             time.sleep(1)
-        time.sleep(15)
+        time.sleep(5)
 
 if __name__ == '__main__':
     main()
