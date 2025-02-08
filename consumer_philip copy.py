@@ -9,26 +9,6 @@ import time
 KAFKA_TOPIC = 'ufc-fighter'
 KAFKA_BROKER = 'localhost:9092'
 
-
-# Dictionary for weight classes with upper and lower limits
-weight_class = {
-    'Strawweight': {'lower': 0, 'upper': 52.2},
-    'Flyweight': {'lower': 52.2, 'upper': 56.7},
-    'Bantamweight': {'lower': 56.7, 'upper': 61.2},
-    'Featherweight': {'lower': 61.2, 'upper': 65.8},
-    'Lightweight': {'lower': 65.8, 'upper': 70.3},
-    'Welterweight': {'lower': 70.3, 'upper': 77.1},
-    'Middleweight': {'lower': 77.1, 'upper': 83.9},
-    'Light Heavyweight': {'lower': 83.9, 'upper': 93.0},
-    'Heavyweight': {'lower': 93.0, 'upper': 120.2}
-}
-def get_weight_class(weight_in_kg):
-    '''Determine the weight class based on weight_in_kg'''
-    for wc, limits in weight_class.items():
-        if weight_in_kg is not None and limits['lower'] <= weight_in_kg < limits['upper']:
-            return wc
-    return 'Unknown'
-
 def sqlite_connect():
     '''Connect to SQLite database'''
     conn = sqlite3.connect('data/ufc_fighters.db')
@@ -53,8 +33,7 @@ def sqlite_connect():
             average_takedowns_landed_per_15_minutes REAL,
             takedown_accuracy REAL,
             takedown_defense REAL,
-            average_submissions_attempted_per_15_minutes REAL,
-            weight_class TEXT
+            average_submissions_attempted_per_15_minutes REAL
         )
     ''')
     conn.commit()
@@ -64,23 +43,22 @@ def sqlite_insert(fighter):
     '''Insert fighter into SQLite database'''
     conn = sqlite3.connect('data/ufc_fighters.db')
     cursor = conn.cursor()
-    fighter['weight_class'] = get_weight_class(fighter['weight_in_kg'])
     filtered_fighter = {key: fighter[key] for key in (
         'name', 'nickname', 'wins', 'losses', 'draws', 'height_cm', 'weight_in_kg', 'reach_in_cm', 'stance', 'date_of_birth', 
         'significant_strikes_landed_per_minute', 'significant_striking_accuracy', 'significant_strikes_absorbed_per_minute', 
         'significant_strike_defence', 'average_takedowns_landed_per_15_minutes', 'takedown_accuracy', 'takedown_defense', 
-        'average_submissions_attempted_per_15_minutes', 'weight_class'
+        'average_submissions_attempted_per_15_minutes'
     )}
     cursor.execute('''INSERT INTO fighters (
         name, nickname, wins, losses, draws, height_cm, weight_in_kg, reach_in_cm, stance, date_of_birth, 
         significant_strikes_landed_per_minute, significant_striking_accuracy, significant_strikes_absorbed_per_minute, 
         significant_strike_defence, average_takedowns_landed_per_15_minutes, takedown_accuracy, takedown_defense, 
-        average_submissions_attempted_per_15_minutes, weight_class
+        average_submissions_attempted_per_15_minutes
     ) VALUES (
         :name, :nickname, :wins, :losses, :draws, :height_cm, :weight_in_kg, :reach_in_cm, :stance, :date_of_birth, 
         :significant_strikes_landed_per_minute, :significant_striking_accuracy, :significant_strikes_absorbed_per_minute, 
         :significant_strike_defence, :average_takedowns_landed_per_15_minutes, :takedown_accuracy, :takedown_defense, 
-        :average_submissions_attempted_per_15_minutes, :weight_class
+        :average_submissions_attempted_per_15_minutes
     )''', filtered_fighter)
     conn.commit()
     conn.close()
