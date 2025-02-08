@@ -12,7 +12,7 @@ fighter1_weight_class = None
 fight_df = None
 
 def calculate_fight_outcome(db_path="data/ufc_fighters.db"):
-    global fighter1_name, fighter2_name, winner, fighter1_weight_class # Globals declared at the beginning of the function
+    global fighter1_name, fighter2_name, winner, fighter1_weight_class 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -37,7 +37,7 @@ def calculate_fight_outcome(db_path="data/ufc_fighters.db"):
             fighter2_name = random.choice(fighters_in_same_class)[0] 
             print(f"Fighter 2: {fighter2_name} is also in the {fighter1_weight_class} weight class.") 
 
-            # Get full data for fighter 1 and fighter 2 after weight class assignment
+            # Get full data after weight class assignment
             cursor.execute("SELECT * FROM fighters WHERE name=?", (fighter1_name,))
             fighter1 = cursor.fetchone()
             cursor.execute("SELECT * FROM fighters WHERE name=?", (fighter2_name,))
@@ -46,7 +46,7 @@ def calculate_fight_outcome(db_path="data/ufc_fighters.db"):
             fighter1_data = dict(zip([description[0] for description in cursor.description], fighter1))
             fighter2_data = dict(zip([description[0] for description in cursor.description], fighter2))
 
-            # Basic Fight Simulation 
+            # Start at zero 
             fighter1_score = 0
             fighter2_score = 0
 
